@@ -1,0 +1,1104 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FlameWorld — Minecraft сервер</title>
+
+    <meta name="description"
+          content="FlameWorld — Minecraft сервер с атмосферой магмы, огня и лавы. Версии 1.16.5 - 1.21.11">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #fff;
+            background:
+                radial-gradient(circle at 50% 20%, rgba(255, 70, 0, .22), transparent 35%),
+                radial-gradient(circle at 10% 80%, rgba(255, 30, 0, .12), transparent 30%),
+                #080504;
+            overflow-x: hidden;
+        }
+
+        /* =========================
+           BACKGROUND
+        ========================= */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(8,5,4,.25),
+                    rgba(8,5,4,.92)
+                ),
+                url("https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=2400&q=80")
+                center / cover;
+        }
+
+        .background::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at center,
+                    transparent 0%,
+                    rgba(0,0,0,.2) 45%,
+                    rgba(0,0,0,.9) 100%);
+        }
+
+        .embers {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ember {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #ff5a00;
+            box-shadow: 0 0 12px #ff3c00;
+            animation: floatUp linear infinite;
+            opacity: .7;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(110vh) scale(.4);
+                opacity: 0;
+            }
+
+            15% {
+                opacity: .9;
+            }
+
+            to {
+                transform: translateY(-20vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 20;
+
+            height: 78px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 6%;
+
+            background: rgba(8, 4, 3, .72);
+            backdrop-filter: blur(18px);
+
+            border-bottom: 1px solid rgba(255, 70, 0, .16);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+
+            display: grid;
+            place-items: center;
+
+            font-size: 23px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(135deg, #ff8a00, #ff2600);
+
+            box-shadow:
+                0 0 25px rgba(255, 60, 0, .35);
+        }
+
+        .logo span {
+            color: #ff5717;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #b9b1ae;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+
+            transition: .25s;
+        }
+
+        nav a:hover {
+            color: #ff6a1a;
+        }
+
+        .header-button {
+            padding: 12px 20px;
+
+            border-radius: 10px;
+
+            color: white;
+            text-decoration: none;
+
+            font-size: 12px;
+            font-weight: 800;
+
+            background:
+                linear-gradient(135deg, #ff6500, #e72c00);
+
+            box-shadow:
+                0 0 20px rgba(255, 64, 0, .22);
+
+            transition: .25s;
+        }
+
+        .header-button:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 0 30px rgba(255, 64, 0, .45);
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            min-height: 850px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 130px 20px 100px;
+
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 9px 16px;
+
+            margin-bottom: 28px;
+
+            border-radius: 50px;
+
+            background: rgba(255, 70, 0, .08);
+            border: 1px solid rgba(255, 80, 0, .25);
+
+            color: #ffb18b;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #ff4a00;
+
+            box-shadow:
+                0 0 10px #ff4a00;
+        }
+
+        h1 {
+            font-size: clamp(60px, 10vw, 125px);
+            line-height: .85;
+            letter-spacing: -7px;
+
+            font-weight: 900;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    #fff 5%,
+                    #ffcfaa 35%,
+                    #ff6b18 65%,
+                    #c72c00 100%
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+
+            filter:
+                drop-shadow(0 0 25px rgba(255, 60, 0, .28));
+        }
+
+        .subtitle {
+            margin: 35px auto 0;
+
+            max-width: 650px;
+
+            color: #bcb2ad;
+
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .server-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+
+            gap: 12px;
+
+            margin-top: 38px;
+        }
+
+        .info {
+            min-width: 180px;
+
+            padding: 15px 20px;
+
+            border-radius: 13px;
+
+            background: rgba(12, 8, 6, .75);
+            border: 1px solid rgba(255, 90, 30, .17);
+
+            backdrop-filter: blur(10px);
+        }
+
+        .info small {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: #887e79;
+
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info strong {
+            font-size: 14px;
+        }
+
+        .ip {
+            color: #ff6b22;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+
+            margin-top: 35px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 16px 28px;
+
+            border-radius: 12px;
+
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            transition: .25s;
+        }
+
+        .btn-primary {
+            color: white;
+
+            background:
+                linear-gradient(135deg, #ff7600, #e42b00);
+
+            box-shadow:
+                0 12px 35px rgba(255, 55, 0, .25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow:
+                0 15px 45px rgba(255, 55, 0, .42);
+        }
+
+        .btn-secondary {
+            color: #eee;
+
+            border: 1px solid rgba(255,255,255,.12);
+
+            background: rgba(255,255,255,.05);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,.09);
+            transform: translateY(-3px);
+        }
+
+        /* =========================
+           SECTIONS
+        ========================= */
+
+        section {
+            padding: 110px 6%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 55px;
+        }
+
+        .section-title span {
+            color: #ff5816;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .section-title h2 {
+            margin-top: 10px;
+
+            font-size: clamp(30px, 5vw, 50px);
+
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .section-title p {
+            max-width: 600px;
+
+            margin: 15px auto 0;
+
+            color: #948a85;
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* =========================
+           FEATURES
+        ========================= */
+
+        .features {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+
+            max-width: 1150px;
+
+            margin: auto;
+        }
+
+        .card {
+            padding: 32px;
+
+            min-height: 220px;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(35,18,12,.82),
+                    rgba(13,8,6,.8)
+                );
+
+            border: 1px solid rgba(255, 80, 20, .13);
+
+            transition: .3s;
+        }
+
+        .card:hover {
+            transform: translateY(-7px);
+
+            border-color:
+                rgba(255, 80, 20, .35);
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,.3),
+                0 0 30px rgba(255,50,0,.07);
+        }
+
+        .card-icon {
+            width: 52px;
+            height: 52px;
+
+            display: grid;
+            place-items: center;
+
+            margin-bottom: 24px;
+
+            border-radius: 14px;
+
+            font-size: 23px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,104,0,.2),
+                    rgba(255,30,0,.05)
+                );
+
+            border: 1px solid rgba(255,90,0,.18);
+        }
+
+        .card h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #958b86;
+
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* =========================
+           SERVER
+        ========================= */
+
+        .server-box {
+            max-width: 1000px;
+
+            margin: auto;
+
+            padding: 50px;
+
+            border-radius: 28px;
+
+            text-align: center;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(255,55,0,.14),
+                    transparent 60%
+                ),
+                rgba(17,9,6,.82);
+
+            border:
+                1px solid rgba(255,80,20,.18);
+
+            box-shadow:
+                0 30px 100px rgba(0,0,0,.3);
+        }
+
+        .server-box h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .server-ip {
+            display: inline-block;
+
+            margin: 20px 0;
+
+            padding: 18px 30px;
+
+            border-radius: 13px;
+
+            background: rgba(0,0,0,.35);
+
+            border: 1px solid rgba(255,80,0,.18);
+
+            color: #ff6a1c;
+
+            font-size: 20px;
+            font-weight: 800;
+
+            cursor: pointer;
+        }
+
+        .copy-text {
+            color: #827873;
+            font-size: 11px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            padding: 45px 6%;
+
+            border-top:
+                1px solid rgba(255,70,0,.1);
+
+            background:
+                rgba(5,3,2,.75);
+        }
+
+        .footer-content {
+            max-width: 1150px;
+
+            margin: auto;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 30px;
+        }
+
+        .footer-logo {
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .footer-logo span {
+            color: #ff5717;
+        }
+
+        footer p {
+            color: #706863;
+            font-size: 11px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media(max-width: 800px) {
+
+            header {
+                padding: 0 20px;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .header-button {
+                display: none;
+            }
+
+            .hero {
+                min-height: 750px;
+            }
+
+            h1 {
+                letter-spacing: -4px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .server-box {
+                padding: 35px 20px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="background"></div>
+
+    <!-- Летающие искры -->
+    <div class="embers" id="embers"></div>
+
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div class="logo">
+            <div class="logo-icon">🔥</div>
+            Flame<span>World</span>
+        </div>
+
+        <nav>
+            <a href="#home">Главная</a>
+            <a href="#about">О сервере</a>
+            <a href="#join">Как играть</a>
+            <a href="#support">Поддержка</a>
+        </nav>
+
+        <a href="#join" class="header-button">
+            ИГРАТЬ
+        </a>
+
+    </header>
+
+
+    <!-- HERO -->
+
+    <main id="home">
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="status">
+                    <div class="status-dot"></div>
+                    СЕРВЕР ОНЛАЙН
+                </div>
+
+                <h1>
+                    FLAME<br>WORLD
+                </h1>
+
+                <p class="subtitle">
+                    Погрузись в мир огня, магмы и приключений.
+                    Создавай, сражайся, развивайся и стань легендой
+                    FlameWorld.
+                </p>
+
+                <div class="server-info">
+
+                    <div class="info">
+                        <small>Онлайн</small>
+                        <strong>0 / 100</strong>
+                    </div>
+
+                    <div class="info">
+                        <small>IP сервера</small>
+                        <strong class="ip">
+                            mc.flameworld.ru
+                        </strong>
+                    </div>
+
+                    <div class="info">
+                        <small>Версия</small>
+                        <strong>
+                            1.16.5 — 1.21.11
+                        </strong>
+                    </div>
+
+                </div>
+
+                <div class="buttons">
+
+                    <a href="#join"
+                       class="btn btn-primary">
+                        🔥 НАЧАТЬ ИГРАТЬ
+                    </a>
+
+                    <a href="#about"
+                       class="btn btn-secondary">
+                        Узнать больше
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ABOUT -->
+
+        <section id="about">
+
+            <div class="section-title">
+
+                <span>FLAMEWORLD</span>
+
+                <h2>
+                    Мир, созданный огнём
+                </h2>
+
+                <p>
+                    Всё, что нужно для комфортной игры
+                    в одном Minecraft-проекте.
+                </p>
+
+            </div>
+
+
+            <div class="features">
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        🌋
+                    </div>
+
+                    <h3>
+                        Атмосфера магмы
+                    </h3>
+
+                    <p>
+                        Уникальный огненный стиль сервера,
+                        огромные миры и атмосфера настоящего
+                        вулканического приключения.
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        ⚔️
+                    </div>
+
+                    <h3>
+                        Сражения
+                    </h3>
+
+                    <p>
+                        Сражайся с другими игроками,
+                        развивай своего персонажа и докажи,
+                        что именно ты достоин звания легенды.
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        💎
+                    </div>
+
+                    <h3>
+                        Развитие
+                    </h3>
+
+                    <p>
+                        Строй базу, добывай ресурсы,
+                        исследуй мир и развивайся вместе
+                        со своим кланом.
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        🧱
+                    </div>
+
+                    <h3>
+                        Свобода строительства
+                    </h3>
+
+                    <p>
+                        Создавай собственные города,
+                        базы и невероятные постройки.
+                        Твой мир — твои правила.
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        🔥
+                    </div>
+
+                    <h3>
+                        Огненная атмосфера
+                    </h3>
+
+                    <p>
+                        Лава, огонь, вулканы и раскалённые
+                        земли создают уникальную атмосферу
+                        FlameWorld.
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        👑
+                    </div>
+
+                    <h3>
+                        Стань легендой
+                    </h3>
+
+                    <p>
+                        Начни с нуля, прокачайся и займи
+                        своё место среди сильнейших игроков
+                        сервера.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- JOIN -->
+
+        <section id="join">
+
+            <div class="section-title">
+
+                <span>КАК НАЧАТЬ</span>
+
+                <h2>
+                    Вход на FlameWorld
+                </h2>
+
+                <p>
+                    Подключиться к серверу можно всего
+                    за несколько секунд.
+                </p>
+
+            </div>
+
+
+            <div class="server-box">
+
+                <h2>
+                    🔥 FlameWorld
+                </h2>
+
+                <p>
+                    Minecraft сервер
+                </p>
+
+                <div
+                    class="server-ip"
+                    id="serverIp"
+                    onclick="copyIP()"
+                    title="Нажмите, чтобы скопировать"
+                >
+                    mc.flameworld.ru
+                </div>
+
+                <div class="copy-text">
+                    Нажми на IP, чтобы скопировать
+                </div>
+
+                <div class="buttons">
+
+                    <a href="#"
+                       class="btn btn-primary"
+                       onclick="copyIP(); return false;">
+                        📋 СКОПИРОВАТЬ IP
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SUPPORT -->
+
+        <section id="support">
+
+            <div class="section-title">
+
+                <span>FLAMEWORLD</span>
+
+                <h2>
+                    Присоединяйся
+                </h2>
+
+                <p>
+                    Заходи на сервер и начинай своё
+                    приключение прямо сейчас.
+                </p>
+
+            </div>
+
+            <div style="
+                display:flex;
+                justify-content:center;
+                gap:15px;
+                flex-wrap:wrap;
+            ">
+
+                <a href="#"
+                   class="btn btn-primary">
+                    🔥 ИГРАТЬ НА FLAMEWORLD
+                </a>
+
+                <a href="#"
+                   class="btn btn-secondary">
+                    💬 Discord
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div class="footer-logo">
+                🔥 Flame<span>World</span>
+            </div>
+
+            <p>
+                © 2026 FlameWorld. Все права защищены.
+            </p>
+
+            <p>
+                Minecraft — торговая марка Mojang Studios.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script>
+
+        /* =========================
+           COPY IP
+        ========================= */
+
+        function copyIP() {
+
+            const ip = "mc.flameworld.ru";
+
+            navigator.clipboard.writeText(ip);
+
+            const element =
+                document.getElementById("serverIp");
+
+            const oldText = element.innerText;
+
+            element.innerText =
+                "✓ IP СКОПИРОВАНО!";
+
+            setTimeout(() => {
+                element.innerText = oldText;
+            }, 1500);
+        }
+
+
+        /* =========================
+           EMBERS
+        ========================= */
+
+        const container =
+            document.getElementById("embers");
+
+        for (let i = 0; i < 35; i++) {
+
+            const ember =
+                document.createElement("div");
+
+            ember.className = "ember";
+
+            ember.style.left =
+                Math.random() * 100 + "%";
+
+            ember.style.animationDuration =
+                (5 + Math.random() * 8) + "s";
+
+            ember.style.animationDelay =
+                Math.random() * 8 + "s";
+
+            ember.style.width =
+                (2 + Math.random() * 4) + "px";
+
+            ember.style.height =
+                ember.style.width;
+
+            container.appendChild(ember);
+        }
+
+
+        /* =========================
+           SMOOTH COPY FALLBACK
+        ========================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                if (!navigator.clipboard) {
+
+                    console.log(
+                        "Clipboard API unavailable"
+                    );
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>
+```
